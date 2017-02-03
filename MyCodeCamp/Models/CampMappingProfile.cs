@@ -31,6 +31,14 @@ namespace MyCodeCamp.Models
                     PostalCode = model.LocationPostalCode,
                     Country = model.LocationCountry
                 }));
+
+            CreateMap<Speaker,SpeakerModel>()
+                .ForMember(s => s.Url, opt => opt.ResolveUsing<SpeakerUrlResolver>())
+                .ReverseMap();
+
+            CreateMap<Talk,TalkModel>()
+                .ForMember(t => t.Url, opt => opt.ResolveUsing<TalkUrlResolver>())
+                .ReverseMap();
         }
     }
 }
