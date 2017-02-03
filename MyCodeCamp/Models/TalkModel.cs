@@ -21,5 +21,7 @@ namespace MyCodeCamp.Models
         public string Prerequisites { get; set; }
         public DateTime StartingTime { get; set; } = DateTime.Now;
         public string Room { get; set; }
+
+        public ICollection<LinkModel> Links { get; set; }
     }
 }

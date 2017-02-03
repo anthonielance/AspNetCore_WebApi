@@ -95,7 +95,7 @@ namespace MyCodeCamp.Controllers
             return BadRequest("Could not add new talk");
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "TalkUpdate")]
         public async Task<IActionResult> Put(string moniker,int speakerId,int id,[FromBody]TalkModel model)
         {
             try

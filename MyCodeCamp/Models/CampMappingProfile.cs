@@ -36,13 +36,14 @@ namespace MyCodeCamp.Models
                 .ForMember(s => s.Url, opt => opt.ResolveUsing<SpeakerUrlResolver>())
                 .ReverseMap();
 
-            CreateMap<Talk,TalkModel>()
-                .ForMember(t => t.Url, opt => opt.ResolveUsing<TalkUrlResolver>())
-                .ReverseMap();
-
             CreateMap<Speaker,SpeakerV2Model>()
                 .IncludeBase<Speaker,SpeakerModel>()
-                .ForMember(s => s.BadgeName, opt => opt.ResolveUsing(s => $"{s.Name} (@{s.TwitterName})"));
+                .ForMember(s => s.BadgeName,opt => opt.ResolveUsing(s => $"{s.Name} (@{s.TwitterName})"));
+
+            CreateMap<Talk,TalkModel>()
+                .ForMember(t => t.Url, opt => opt.ResolveUsing<TalkUrlResolver>())
+                .ForMember(t => t.Links, opt => opt.ResolveUsing<TalkLinksResolver>())
+                .ReverseMap();
         }
     }
 }
