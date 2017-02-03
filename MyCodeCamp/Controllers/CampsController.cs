@@ -15,6 +15,8 @@ using MyCodeCamp.Models;
 
 namespace MyCodeCamp.Controllers
 {
+    [Authorize]
+    [EnableCors("AnyGET")]
     [Route("api/[controller]")]
     [ValidateModel]
     public class CampsController : BaseController
@@ -63,6 +65,8 @@ namespace MyCodeCamp.Controllers
             return BadRequest();
         }
 
+        [EnableCors("Wildermuth")]
+        [Authorize(Policy = "SuperUsers")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CampModel model)
         {

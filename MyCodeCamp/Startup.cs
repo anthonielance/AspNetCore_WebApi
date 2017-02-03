@@ -29,8 +29,8 @@ namespace MyCodeCamp
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile("appsettings.json",optional: true,reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json",optional: true)
                 .AddEnvironmentVariables();
 
             _configuration = builder.Build();
@@ -78,20 +78,20 @@ namespace MyCodeCamp
             services.AddCors(cfg =>
             {
                 cfg.AddPolicy("Wildermuth",bldr =>
-               {
-                   bldr.AllowAnyHeader()
-                   .AllowAnyMethod()
-                   .WithOrigins("http://wildermuth.com");
-               });
+                {
+                    bldr.AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://wildermuth.com");
+                });
 
                 cfg.AddPolicy("AnyGET",bldr =>
-               {
-                   bldr.AllowAnyHeader()
-                   .WithMethods("GET")
-                   .AllowAnyOrigin();
-               });
+                {
+                    bldr.AllowAnyHeader()
+                    .WithMethods("GET")
+                    .AllowAnyOrigin();
+                });
             });
-            
+
             services.AddAuthorization(config =>
             {
                 config.AddPolicy("SuperUsers",p => p.RequireClaim("SuperUser","True"));
@@ -99,13 +99,13 @@ namespace MyCodeCamp
 
             // Add framework services.
             services.AddMvc(opt =>
+            {
+                if (!_env.IsProduction())
                 {
-                    if (!_env.IsProduction())
-                    {
-                        opt.SslPort = 44388;
-                    }
-                    opt.Filters.Add(new RequireHttpsAttribute());
-                })
+                    opt.SslPort = 44388;
+                }
+                opt.Filters.Add(new RequireHttpsAttribute());
+            })
                 .AddJsonOptions(opt =>
                 {
                     opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -113,7 +113,7 @@ namespace MyCodeCamp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, CampDbInitializer seeder,CampIdentityInitializer identitySeeder)
+        public void Configure(IApplicationBuilder app,IHostingEnvironment env,ILoggerFactory loggerFactory,CampDbInitializer seeder,CampIdentityInitializer identitySeeder)
         {
             loggerFactory.AddConsole(_configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -126,6 +126,20 @@ namespace MyCodeCamp
             //});
 
             app.UseIdentity();
+            app.UseJwtBearerAuthentication(new JwtBearerOptions
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = _configuration["Tokens:Issuer"],
+                    ValidAudience = _configuration["Tokens:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"])),
+                    ValidateLifetime = true
+                }
+
+            });
 
             app.UseMvc();
 

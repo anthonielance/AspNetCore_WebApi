@@ -21,7 +21,7 @@ namespace MyCodeCamp.Controllers
         private IMapper _mapper;
         private ICampRepository _repo;
 
-        public TalksController(ICampRepository repo, ILogger<TalksController> logger, IMapper mapper)
+        public TalksController(ICampRepository repo,ILogger<TalksController> logger,IMapper mapper)
         {
             _repo = repo;
             _logger = logger;
@@ -29,7 +29,7 @@ namespace MyCodeCamp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get(string moniker, int speakerId)
+        public IActionResult Get(string moniker,int speakerId)
         {
             var talks = _repo.GetTalks(speakerId);
             if (talks == null) return NotFound();
@@ -38,8 +38,8 @@ namespace MyCodeCamp.Controllers
             return Ok(_mapper.Map<IEnumerable<TalkModel>>(talks));
         }
 
-        [HttpGet("{id}", Name = "TalkGet")]
-        public IActionResult Get(string moniker, int speakerId, int id)
+        [HttpGet("{id}",Name = "TalkGet")]
+        public IActionResult Get(string moniker,int speakerId,int id)
         {
             var talk = _repo.GetTalk(id);
             if (talk == null) return NotFound();
@@ -49,12 +49,12 @@ namespace MyCodeCamp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(string moniker, int speakerId,[FromBody]TalkModel model)
+        public async Task<IActionResult> Post(string moniker,int speakerId,[FromBody]TalkModel model)
         {
             try
             {
                 var speaker = _repo.GetSpeaker(speakerId);
-                if (speaker == null) return BadRequest("Could not find speaker selected");
+                if (speaker == null) return BadRequest("Could not find speaker");
 
                 var talk = _mapper.Map<Talk>(model);
                 talk.Speaker = speaker;
@@ -62,7 +62,7 @@ namespace MyCodeCamp.Controllers
                 _repo.Add(talk);
                 if (await _repo.SaveAllAsync())
                 {
-                    var url = Url.Link("TalkGet",new { moniker = moniker, speakerId = speaker.Id, id = talk.Id });
+                    var url = Url.Link("TalkGet",new { moniker = moniker,speakerId = speakerId,id = talk.Id });
                     return Created(url,_mapper.Map<TalkModel>(model));
                 }
             }
@@ -75,13 +75,13 @@ namespace MyCodeCamp.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(string moniker, int speakerId, int id, [FromBody]TalkModel model)
+        public async Task<IActionResult> Put(string moniker,int speakerId,int id,[FromBody]TalkModel model)
         {
             try
             {
                 var talk = _repo.GetTalk(id);
                 if (talk == null) return NotFound();
-                
+
                 _mapper.Map(model,talk);
 
                 if (await _repo.SaveAllAsync())
@@ -98,7 +98,7 @@ namespace MyCodeCamp.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string moniker,int speakerId, int id)
+        public async Task<IActionResult> Delete(string moniker,int speakerId,int id)
         {
             try
             {
