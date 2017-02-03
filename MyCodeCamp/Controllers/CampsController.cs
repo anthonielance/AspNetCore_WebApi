@@ -4,15 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
+using MyCodeCamp.Filters;
 using MyCodeCamp.Models;
 
 namespace MyCodeCamp.Controllers
 {
     [Route("api/[controller]")]
+    [ValidateModel]
     public class CampsController : BaseController
     {
         private ILogger<CampsController> _logger;
@@ -34,7 +38,6 @@ namespace MyCodeCamp.Controllers
         {
             var camps = _repo.GetAllCamps();
 
-            //return Ok(camps);
             return Ok(_mapper.Map<IEnumerable<CampModel>>(camps));
         }
 
@@ -65,8 +68,6 @@ namespace MyCodeCamp.Controllers
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-
                 _logger.LogInformation("Creating a new Code Camp");
 
                 var camp = _mapper.Map<Camp>(model);
@@ -95,8 +96,6 @@ namespace MyCodeCamp.Controllers
         {
             try
             {
-                if (!ModelState.IsValid) return BadRequest(ModelState);
-
                 var oldCamp = _repo.GetCampByMoniker(moniker);
                 if (oldCamp == null) return NotFound($"Could not find a camp with an Moniker of {moniker}");
 
