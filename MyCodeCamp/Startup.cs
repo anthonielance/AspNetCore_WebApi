@@ -53,6 +53,8 @@ namespace MyCodeCamp
             services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
             services.AddAutoMapper();
 
+            services.AddMemoryCache();
+
             services.AddIdentity<CampUser,IdentityRole>()
                 .AddEntityFrameworkStores<CampContext>();
 
@@ -91,9 +93,9 @@ namespace MyCodeCamp
                 cfg.Conventions.Controller<TalksController>()
                 .HasApiVersion(new ApiVersion(1,0))
                 .HasApiVersion(new ApiVersion(1,1))
-                .HasApiVersion(new ApiVersion(2,0))
-                .Action(m => m.Post(default(string),default(int),default(TalkModel)))
-                    .MapToApiVersion(new ApiVersion(2,1));
+                .HasApiVersion(new ApiVersion(2,0));
+                //.Action(m => m.Post(default(string),default(int),default(TalkModel)))
+                //    .MapToApiVersion(new ApiVersion(2,0));
             });
 
             services.AddCors(cfg =>
